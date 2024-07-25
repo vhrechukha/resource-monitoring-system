@@ -1,4 +1,3 @@
-version: '3.6'
 services:
   telegraf:
     image: telegraf:1.18-alpine
@@ -34,6 +33,27 @@ services:
       - ./grafana/provisioning/:/etc/grafana/provisioning/
       - ./grafana/dashboards/:/var/lib/grafana/dashboards/
 
+  mongo:
+    image: mongo:4.4
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
+    environment:
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+
 volumes:
   grafana_data: {}
   influxdb_data: {}
+  mongo_data: {}
