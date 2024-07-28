@@ -46,7 +46,7 @@ async fn add_item(client: web::Data<Client>, item: web::Json<Item>) -> impl Resp
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
-    let client_options = ClientOptions::parse("mongodb://localhost:27017")
+    let client_options = ClientOptions::parse("mongodb://root:example@localhost:27017")
         .await
         .unwrap();
     let client = Client::with_options(client_options).unwrap();

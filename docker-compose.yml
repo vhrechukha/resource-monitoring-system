@@ -1,16 +1,23 @@
 services:
   telegraf:
     image: telegraf:1.18-alpine
+    command: telegraf --debug
+    env_file:
+      - .env
     volumes:
-    - ./telegraf/etc/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./telegraf/etc/telegraf.conf:/etc/telegraf/telegraf.conf:ro
     depends_on:
       - influxdb
     links:
       - influxdb
     ports:
-    - '127.0.0.1:8125:8125/udp'
+      - '127.0.0.1:8125:8125/udp'
+    user: root
+    entrypoint: "telegraf"
 
   influxdb:
+    platform: linux/x86_64
     image: influxdb:1.8-alpine
     env_file: configuration.env
     ports:
@@ -39,8 +46,10 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
 
   elasticsearch:
+    platform: linux/x86_64
     image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
     environment:
       - discovery.type=single-node
