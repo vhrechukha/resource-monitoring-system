@@ -108,6 +108,17 @@ services:
     networks:
       - monitor-net
 
+  load_tester:
+    image: jordi/ab
+    env_file: configuration.env
+    depends_on:
+      - nginx
+    entrypoint: sh -c "ab -n 1000 -c 10 http://nginx && sleep 60"
+    networks:
+      - monitor-net
+    deploy:
+      replicas: ${LOAD_TESTER_REPLICAS:-0}
+
 
 volumes:
   grafana_data: {}
