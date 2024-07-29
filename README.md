@@ -1,14 +1,22 @@
-# Example Docker Compose project for Telegraf, InfluxDB and Grafana
-
-This an example project to show the TIG (Telegraf, InfluxDB and Grafana) stack.
-
-![Example Screenshot](./example.png?raw=true "Example Screenshot")
+# Docker Compose project for Telegraf, InfluxDB Grafana, Rust, MongoDB
 
 ## Start the stack with docker compose
 
 ```bash
-$ docker-compose up
+$ docker-compose up -d
 ```
+
+## Screenshots of dashboards under load
+
+### Grafana Schema
+The Grafana dashboard schema used is automatically uploaded from [here](https://grafana.com/grafana/dashboards/61-telegraf-metrics) and modified according to the needs.
+
+![Telegraf Metrics 1 Screenshot](./docs/telegraf-metrics-1.png "Example Screenshot")
+![Telegraf Metrics 2 Screenshot](./docs/telegraf-metrics-2.png "Example Screenshot")
+![Telegraf Metrics 3 Screenshot](./docs/telegraf-metrics-3.png "Example Screenshot")
+![Telegraf Metrics 4 Screenshot](./docs/telegraf-metrics-4.png "Example Screenshot")
+![Telegraf Metrics 5 Screenshot](./docs/telegraf-metrics-5.png "Example Screenshot")
+
 
 ## Services and Ports
 
@@ -26,8 +34,45 @@ $ docker-compose up
 - Password: admin 
 - Database: influx
 
+### MongoDB
+- Port: 27017
+- User: root 
+- Password: example 
+- Database: test
 
-Run the influx client:
+### Rust App
+- URL: http://localhost:8080 
+
+## Steps to Start Testing
+
+1. **Build and Start Docker Containers**
+   ```bash
+   $ docker-compose up -d
+   ```
+
+2. **Navigate to the `testing` directory**
+   ```bash
+   $ cd testing
+   ```
+
+3. **Start the load tester**
+   ```bash
+   $ ./start-containers.sh
+   ```
+
+4. **Verify load tester logs**
+   - Ensure that the load tester is running correctly by checking the logs. 
+   ```bash
+   $ docker logs -f resource-monitoring-system-load_tester-1
+   ```
+
+5. **Check Grafana Dashboard**
+   - Open your browser and navigate to [Grafana](http://localhost:3000)
+   - Login with the default credentials (admin/admin)
+   - Observe the dashboards for real-time metrics.
+
+
+## Run the influx client:
 
 ```bash
 $ docker-compose exec influxdb influx -execute 'SHOW DATABASES'
@@ -43,31 +88,6 @@ InfluxDB shell version: 1.8.0
 >
 ```
 
-[Import data from a file with -import](https://docs.influxdata.com/influxdb/v1.8/tools/shell/#import-data-from-a-file-with-import)
-
-```bash
-$ docker-compose exec -w /imports influxdb influx -import -path=data.txt -precision=s
-```
-
-## Run the PHP Example
-
-The PHP example generates random example metrics. The random metrics are beeing sent via UDP to the telegraf agent using the StatsD protocol.
-
-The telegraf agents aggregates the incoming data and perodically persists the data into the InfluxDB database.
-
-Grafana connects to the InfluxDB database and is able to visualize the incoming data.
-
-```bash
-$ cd php-example
-$ composer install
-$ php example.php
-Sending Random metrics. Use Ctrl+C to stop.
-..........................^C
-Runtime:	0.88382697105408 Seconds
-Ops:		27 
-Ops/s:		30.548965899738 
-Killed by Ctrl+C
-```
 
 ## License
 
